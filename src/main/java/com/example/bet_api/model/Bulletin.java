@@ -52,6 +52,9 @@ public class Bulletin extends BaseEntity {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @Version
+    private Long version;
+
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = Instant.now();

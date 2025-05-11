@@ -14,4 +14,6 @@ public interface BetslipService {
      * @return the saved bulletin
      */
     BetslipResponse create(User user, BetslipCreateRequest request);
+
+    BetslipResponse createBetslipWithOptimisticLockHandling(User user, BetslipCreateRequest request);
 }

@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface BulletinRepository extends JpaRepository<Bulletin, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_READ)
+    @Lock(LockModeType.OPTIMISTIC)
     @Query("SELECT b FROM Bulletin b WHERE b.eventId = :eventId")
     Optional<Bulletin> findByIdWithReadLock(@Param("eventId") Long eventId);
 }
