@@ -1,4 +1,4 @@
-package com.example.bet_api.service.impl;
+package com.example.bet_api.service;
 
 import com.example.bet_api.model.User;
 import com.example.bet_api.repository.UserRepository;

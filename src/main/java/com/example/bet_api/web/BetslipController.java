@@ -32,6 +32,6 @@ public class BetslipController {
     public BetslipResponse create(@CurrentUser User user,
                                   @RequestBody @Valid @Parameter(description = "Betslip create request")
                                   BetslipCreateRequest request) {
-        return betslipService.createBetslipWithOptimisticLockHandling(user, request);
+        return betslipService.create(user, request);
     }
 }

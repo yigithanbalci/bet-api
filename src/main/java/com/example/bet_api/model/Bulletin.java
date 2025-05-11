@@ -1,5 +1,6 @@
 package com.example.bet_api.model;
 
+import com.example.bet_api.dto.BetType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.envers.Audited;
@@ -58,5 +59,13 @@ public class Bulletin extends BaseEntity {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    public BigDecimal getOdds(BetType betType) {
+        return switch (betType) {
+            case HOME -> this.getOddsHomeWin();
+            case DRAW -> this.getOddsDraw();
+            case AWAY -> this.getOddsAwayWin();
+        };
     }
 }

@@ -11,9 +11,7 @@ public interface BetslipService {
      *
      * @param user    doing the create operation
      * @param request the betslip to create
-     * @return the saved bulletin
+     * @return the saved betslip
      */
     BetslipResponse create(User user, BetslipCreateRequest request);
-
-    BetslipResponse createBetslipWithOptimisticLockHandling(User user, BetslipCreateRequest request);
 }

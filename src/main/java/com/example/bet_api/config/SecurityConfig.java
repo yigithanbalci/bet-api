@@ -1,7 +1,7 @@
 package com.example.bet_api.config;
 
 import com.example.bet_api.repository.UserRepository;
-import com.example.bet_api.service.impl.UserDetailsServiceImpl;
+import com.example.bet_api.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

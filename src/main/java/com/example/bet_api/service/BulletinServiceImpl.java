@@ -1,10 +1,9 @@
-package com.example.bet_api.service.impl;
+package com.example.bet_api.service;
 
 import com.example.bet_api.dto.BulletinCreateRequest;
 import com.example.bet_api.dto.BulletinResponse;
 import com.example.bet_api.model.User;
 import com.example.bet_api.repository.BulletinRepository;
-import com.example.bet_api.service.BulletinService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
