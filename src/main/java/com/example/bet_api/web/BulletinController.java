@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/bulletins")
@@ -61,9 +62,9 @@ public class BulletinController {
         return bulletinService.getAll(pageable);
     }
 
-    @GetMapping(value = "/subscribe/{eventId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<BulletinResponse> streamBulletins(@PathVariable Long eventId) {
+    @GetMapping(value = "/live", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<List<BulletinResponse>> streamBulletins() {
         return Flux.interval(Duration.ofSeconds(1))
-                .map(tick -> bulletinService.getByEventId(eventId));
+                .map(tick -> bulletinService.getAll());
     }
 }

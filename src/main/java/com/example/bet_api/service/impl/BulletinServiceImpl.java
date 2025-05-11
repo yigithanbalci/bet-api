@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @Transactional
@@ -32,7 +34,8 @@ public class BulletinServiceImpl implements BulletinService {
 
     @Override
     public BulletinResponse update(@Valid BulletinUpdateRequest request) {
-        var bulletin = bulletinRepository.findById(request.eventId()).orElseThrow(() -> new EntityNotFoundException(String.format("Bulletin not found by id %d", request.eventId())));
+        var bulletin = bulletinRepository.findById(request.eventId()).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Bulletin not found by id %d", request.eventId())));
         bulletin.setOddsHomeWin(request.oddsHomeWin());
         bulletin.setOddsDraw(request.oddsDraw());
         bulletin.setOddsAwayWin(request.oddsAwayWin());
@@ -48,6 +51,16 @@ public class BulletinServiceImpl implements BulletinService {
             throw new EntityNotFoundException(String.format("Bulletin not found by id %d", eventId));
         }
         return BulletinResponse.toResponse(bulletin);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BulletinResponse> getAll() {
+        var bulletins = bulletinRepository.findAll();
+        if (bulletins.isEmpty()) {
+            throw new EntityNotFoundException("No Bulletins found");
+        }
+        return bulletins.stream().map(BulletinResponse::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
