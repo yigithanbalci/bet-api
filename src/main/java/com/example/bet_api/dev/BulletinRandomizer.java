@@ -4,6 +4,7 @@ import com.example.bet_api.repository.BulletinRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 public class BulletinRandomizer {
     private final BulletinRepository bulletinRepository;
 
-    //    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 2000)
     public void run() {
         Thread.ofVirtual().start(() -> {
             bulletinRepository.saveAll(

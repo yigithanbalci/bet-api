@@ -24,5 +24,10 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+#for now leave it as default
+#springdoc:
+#  swagger-ui:
+#    path: /docs
+
 logging:
   level.org.springframework.security: DEBUG
