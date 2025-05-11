@@ -2,10 +2,7 @@ package com.example.bet_api.service;
 
 import com.example.bet_api.dto.BulletinCreateRequest;
 import com.example.bet_api.dto.BulletinResponse;
-import com.example.bet_api.dto.BulletinUpdateRequest;
 import com.example.bet_api.model.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -21,32 +18,9 @@ public interface BulletinService {
     BulletinResponse create(User user, BulletinCreateRequest request);
 
     /**
-     * Update an existing bulletin.
-     *
-     * @param request the updated bulletin object
-     * @return the updated bulletin
-     */
-    BulletinResponse update(BulletinUpdateRequest request);
-
-    /**
-     * Get a bulletin by its event ID.
-     *
-     * @param eventId the external event ID
-     * @return an Optional containing the bulletin, if found
-     */
-    BulletinResponse getByEventId(Long eventId);
-
-    /**
      * Retrieve all bulletins.
      *
      * @return a list of bulletins
      */
     List<BulletinResponse> getAll();
-
-    /**
-     * Retrieve all bulletins by pagination
-     *
-     * @return a list of bulletins
-     */
-    Page<BulletinResponse> getAll(Pageable pageable);
 }

@@ -2,7 +2,6 @@ package com.example.bet_api.web;
 
 import com.example.bet_api.dto.BulletinCreateRequest;
 import com.example.bet_api.dto.BulletinResponse;
-import com.example.bet_api.dto.BulletinUpdateRequest;
 import com.example.bet_api.model.User;
 import com.example.bet_api.security.CurrentUser;
 import com.example.bet_api.service.BulletinService;
@@ -36,21 +35,6 @@ public class BulletinController {
                                    @RequestBody @Valid @Parameter(description = "Bulletin create request")
                                    BulletinCreateRequest request) {
         return bulletinService.create(user, request);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping
-    @Operation(summary = "Update a new event(bulletin)")
-    public BulletinResponse update(@RequestBody @Valid @Parameter(description = "Bulletin update request")
-                                   BulletinUpdateRequest request) {
-        return bulletinService.update(request);
-    }
-
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @GetMapping("/{eventId}")
-    @Operation(summary = "Get an event(bulletin) by id")
-    public BulletinResponse getByEventId(@PathVariable Long eventId) {
-        return bulletinService.getByEventId(eventId);
     }
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
