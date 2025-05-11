@@ -8,6 +8,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,6 +22,20 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<String> handleAuthorizationException(AuthorizationDeniedException e) {
+        log.error("Authorization denied error: {} ", e.getLocalizedMessage(), e);
+        try {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(objectMapper.writeValueAsString(e.getLocalizedMessage()));
+        } catch (JsonProcessingException jsonProcessingException) {
+            log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
+                    jsonProcessingException);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 
     @ExceptionHandler(AuthorizationException.class)
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)

@@ -17,3 +17,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  profiles:
+    active: dev
+  jackson:
+    time-zone: UTC
+    serialization:
+      write-dates-as-timestamps: false
+
+logging:
+  level.org.springframework.security: DEBUG

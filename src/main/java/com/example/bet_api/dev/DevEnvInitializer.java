@@ -20,10 +20,16 @@ public class DevEnvInitializer {
 
     @PostConstruct
     public void init() {
+        log.info("Initializing dev environment");
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String pass = bCryptPasswordEncoder.encode("1234");
-        User user = User.builder().username("user1").password(pass).build();
+        User user = User.builder().username("user").password(pass).role("USER").build();
+        User admin = User.builder().username("admin").password(pass).role("ADMIN").build();
+        User system = User.builder().username("system").password(pass).role("ADMIN").build();
 
         userRepository.save(user);
+        userRepository.save(admin);
+        userRepository.save(system);
+        log.info("Finished initializing dev environment");
     }
 }

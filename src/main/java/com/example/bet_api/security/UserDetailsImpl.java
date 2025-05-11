@@ -21,7 +21,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole());
         return Collections.singletonList(authority);
     }
 
@@ -37,5 +37,9 @@ public class UserDetailsImpl implements UserDetails {
 
     public Long getUserId() {
         return user.getId();
+    }
+
+    public User getUser() {
+        return user;
     }
 }
