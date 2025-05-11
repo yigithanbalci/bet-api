@@ -18,7 +18,7 @@ public class BetslipServiceImpl implements BetslipService {
     private final BulletinRepository bulletinRepository;
     private final BetslipPersistenceService betslipPersistenceService;
 
-    @Transactional(timeout = 5000)
+    @Transactional(timeout = 2000)
     public BetslipResponse create(User user, BetslipCreateRequest request) {
         var bulletin = bulletinRepository.findById(request.eventId()).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Bulletin with id %s not found", request.eventId())));
@@ -27,10 +27,6 @@ public class BetslipServiceImpl implements BetslipService {
         betslip.setBulletin(bulletin);
         betslip.setCreatedBy(user);
         betslip.setCustomer(user);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-        }
         return BetslipResponse.toResponse(betslipPersistenceService.create(user, betslip), requestedOdds);
     }
 }

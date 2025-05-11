@@ -25,7 +25,7 @@ public class BetslipPersistenceServiceImpl implements BetslipPersistenceService 
 
     @Retryable(retryFor = {
             ObjectOptimisticLockingFailureException.class}, maxAttempts = 3, backoff = @Backoff(delay = 300, multiplier = 2))
-    @Transactional(timeout = 5000, propagation = Propagation.REQUIRES_NEW)
+    @Transactional(timeout = 2000, propagation = Propagation.REQUIRES_NEW)
     @Override
     public Betslip create(User user, Betslip betslip) {
         var bulletin = bulletinRepository.findByIdWithReadLock(betslip.getBulletin().getEventId()).orElseThrow(
