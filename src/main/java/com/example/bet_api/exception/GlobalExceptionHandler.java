@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
                     .body(objectMapper.writeValueAsString(e.getLocalizedMessage()));
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
-                    jsonProcessingException);
+                      jsonProcessingException);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
                     .body(objectMapper.writeValueAsString(e.getLocalizedMessage()));
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
-                    jsonProcessingException);
+                      jsonProcessingException);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
                     .body(objectMapper.writeValueAsString(e.getLocalizedMessage()));
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
-                    jsonProcessingException);
+                      jsonProcessingException);
             return ResponseEntity.notFound().build();
         }
     }
@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
                     .body(objectMapper.writeValueAsString(errors));
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
-                    jsonProcessingException);
+                      jsonProcessingException);
             return ResponseEntity.badRequest().build();
         }
     }
@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
                     .body(objectMapper.writeValueAsString(errors));
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
-                    jsonProcessingException);
+                      jsonProcessingException);
             return ResponseEntity.badRequest().build();
         }
     }
@@ -116,7 +116,7 @@ public class GlobalExceptionHandler {
                     .body(objectMapper.writeValueAsString(e.getLocalizedMessage()));
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
-                    jsonProcessingException);
+                      jsonProcessingException);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -130,7 +130,7 @@ public class GlobalExceptionHandler {
                     .body(objectMapper.writeValueAsString(e.getLocalizedMessage()));
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
-                    jsonProcessingException);
+                      jsonProcessingException);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

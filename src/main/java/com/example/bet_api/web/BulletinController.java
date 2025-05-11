@@ -11,9 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +20,7 @@ import reactor.core.publisher.Flux;
 import java.time.Duration;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/bulletins")
 @RequiredArgsConstructor
@@ -55,16 +54,12 @@ public class BulletinController {
     }
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @GetMapping
+    @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "Get all events(bulletin)")
-    public Page<BulletinResponse> getAll(@PageableDefault(size = 10, sort = "startTimeUtc")
-                                         @Parameter(description = "Pagination parameters") Pageable pageable) {
-        return bulletinService.getAll(pageable);
-    }
-
-    @GetMapping(value = "/live", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<List<BulletinResponse>> streamBulletins() {
+    public Flux<List<BulletinResponse>> live() {
         return Flux.interval(Duration.ofSeconds(1))
-                .map(tick -> bulletinService.getAll());
+                .map(tick -> bulletinService.getAll())
+                .doOnCancel(() -> log.info("BulletinController live canceled"))
+                .doOnError(error -> log.error("BulletinController live error", error));
     }
 }

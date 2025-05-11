@@ -50,19 +50,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasRole("USER")
-                        .anyRequest().authenticated()
-                )
+                                               .requestMatchers("/h2-console/**").permitAll()
+                                               .requestMatchers("/admin/**").hasRole("ADMIN")
+                                               .requestMatchers("/user/**").hasRole("USER")
+                                               .anyRequest().authenticated()
+                                      )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/h2-console/**")
                         .ignoringRequestMatchers("/api/**")
-                )
+                     )
                 .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin) // Allow H2 console in a frame
-                )
-                .formLogin(Customizer.withDefaults())
+                                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin) // Allow H2 console in a frame
+                        )
+                // TODO: yigithanbalci 11.05.2025: remove after local tests
+//                .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();

@@ -43,6 +43,8 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.testcontainers:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //todo: test with spock later, that seems like a nice lib
+    testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
