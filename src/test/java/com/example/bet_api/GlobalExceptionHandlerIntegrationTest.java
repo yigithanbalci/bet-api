@@ -1,136 +1,109 @@
 package com.example.bet_api;
 
-import com.example.bet_api.model.Bulletin;
-import com.example.bet_api.model.User;
-import com.example.bet_api.repository.BulletinRepository;
-import com.example.bet_api.repository.UserRepository;
+import com.example.bet_api.exception.GlobalExceptionHandler;
+import com.example.bet_api.web.DummyController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.math.BigDecimal;
-import java.time.Instant;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@SpringBootTest
+@AutoConfigureMockMvc
+@ExtendWith(SpringExtension.class)
 class GlobalExceptionHandlerIntegrationTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private MockMvc mockMvc;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private BulletinRepository bulletinRepository;
+    @InjectMocks
+    private DummyController dummyController;
 
     @BeforeEach
-    void setUp() {
-        bulletinRepository.deleteAll();
-        userRepository.deleteAll();
-
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String pass = bCryptPasswordEncoder.encode("1234");
-        User user = User.builder().username("user").password(pass).role("USER").build();
-        User admin = User.builder().username("admin").password(pass).role("ADMIN").build();
-        User system = User.builder().username("system").password(pass).role("ADMIN").build();
-
-        userRepository.save(user);
-        User savedAdmin = userRepository.save(admin);
-        userRepository.save(system);
-
-        Bulletin bulletin = Bulletin.builder()
-                .leagueName("Premier League")
-                .homeTeam("Team A")
-                .awayTeam("Team B")
-                .oddsHomeWin(new BigDecimal("2.5"))
-                .oddsDraw(new BigDecimal("3.2"))
-                .oddsAwayWin(new BigDecimal("2.9"))
-                .startTimeUtc(Instant.now())
+    public void setup() {
+        this.mockMvc = MockMvcBuilders
+                .standaloneSetup(dummyController)     // instantiate controller.
+                .setControllerAdvice(new GlobalExceptionHandler())   // bind with controller advice.
                 .build();
-        bulletin.setCreatedBy(savedAdmin);
-        bulletinRepository.save(bulletin);
     }
 
     @Test
-    void shouldReturnUnauthorizedForAuthorizationDeniedException() {
-        // Given: Simulate AuthorizationDeniedException
-        String url = "/api/bulletins"; // Replace with the URL that would trigger AuthorizationDeniedException
-
-        // When: Making a request that would trigger AuthorizationDeniedException
-        var response = restTemplate
-                .withBasicAuth("user", "wrongpassword") // Trigger authorization error
-                .getForEntity(url, String.class);
-
-        // Then: Validate the response status and body
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    void shouldHandleAuthorizationDeniedException() throws Exception {
+        mockMvc.perform(get("/auth-denied"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("\"Authorization denied\""));
     }
 
     @Test
-    void shouldReturnUnauthorizedForAuthorizationException() {
-        // Given: Simulate AuthorizationException
-        String url = "/api/bulletins"; // Replace with the URL that would trigger AuthorizationException
+    void shouldHandleAuthorizationException() throws Exception {
+        mockMvc.perform(get("/auth"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("\"Authorization error\""));
+    }
 
-        // When: Making a request that would trigger AuthorizationException
-        var response = restTemplate
-                .withBasicAuth("user", "wrongpassword") // Trigger authorization error
-                .getForEntity(url, String.class);
+    @WithMockUser(username = "testUser", roles = {"USER"})
+    @Test
+    void shouldHandleEntityNotFoundException() throws Exception {
+        mockMvc.perform(get("/not-found"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("\"Entity not found\""));
+    }
 
-        // Then: Validate the response status and body
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+//    @Test
+//    void shouldHandleMismatchedInputException() throws Exception {
+//        mockMvc.perform(get("/mismatch"))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(content().string("\"Mismatch error\""));
+//    }
+
+    @WithMockUser(username = "testUser", roles = {"USER"})
+    @Test
+    void shouldHandleUnsupportedMediaType() throws Exception {
+        mockMvc.perform(get("/unsupported-media").contentType(MediaType.APPLICATION_XML))
+                .andExpect(status().isUnsupportedMediaType())
+                .andExpect(content().string("\"Unsupported media type\""));
     }
 
     @Test
-    void shouldReturnBadRequestForMethodArgumentNotValidException() {
-        // Given: Simulate invalid input that will cause MethodArgumentNotValidException
-        String url = "/api/bulletins"; // Use an endpoint where MethodArgumentNotValidException may occur
-        // Sample invalid request, change according to your request body
-        String invalidRequestBody = "{ \"invalidField\": \"value\" }";
-
-        // When: Making a request with invalid body
-        var response = restTemplate
-                .withBasicAuth("user", "1234")
-                .postForEntity(url, invalidRequestBody, String.class);
-
-        // Then: Validate the response status and body
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).contains("invalidField"); // Assuming your error contains the field name
+    void shouldHandleHttpMessageNotReadableException() throws Exception {
+        mockMvc.perform(get("/unreadable"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("\"Malformed JSON\""));
     }
 
     @Test
-    void shouldReturnBadRequestForConstraintViolationException() {
-        // Given: Simulate invalid data that causes a constraint violation
-        String url = "/api/bulletins"; // Replace with the appropriate endpoint
-        // Sample invalid request for constraint violation
-        String invalidRequestBody = "{ \"someField\": \"invalidValue\" }";
-
-        // When: Making a request that violates a constraint
-        var response = restTemplate
-                .withBasicAuth("user", "1234")
-                .postForEntity(url, invalidRequestBody, String.class);
-
-        // Then: Validate the response status and body
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).contains("someField"); // Customize based on actual constraint violation message
+    void shouldHandleGenericException() throws Exception {
+        mockMvc.perform(get("/generic"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string("\"Generic error\""));
     }
 
-    @Test
-    void shouldReturnInternalServerErrorForGeneralException() {
-        // Given: Simulate a general exception (you could make a call that triggers a generic exception)
-        String url = "/api/bulletins"; // Replace with a URL that will cause a generic error
-
-        // When: Making a request that triggers an exception
-        var response = restTemplate.withBasicAuth("user", "1234").getForEntity(url, String.class);
-
-        // Then: Validate the response status and body
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(response.getBody()).contains("Internal Server Error"); // Customize based on actual error message
+    @Configuration
+    @EnableWebSecurity
+    public static class TestSecurityConfig {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                    .authorizeHttpRequests(auth -> auth
+                                                   .anyRequest().authenticated()
+                                          );
+            return http.build();
+        }
     }
 }

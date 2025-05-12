@@ -8,8 +8,10 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -111,6 +113,34 @@ public class GlobalExceptionHandler {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleMismatchedException(MismatchedInputException e) {
         log.error("Mismatched error: {} ", e.getLocalizedMessage(), e);
+        try {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(objectMapper.writeValueAsString(e.getLocalizedMessage()));
+        } catch (JsonProcessingException jsonProcessingException) {
+            log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
+                      jsonProcessingException);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    public ResponseEntity<String> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException e) {
+        log.error("Unsupported Media Type: {}", e.getLocalizedMessage(), e);
+        try {
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                    .body(objectMapper.writeValueAsString(e.getLocalizedMessage()));
+        } catch (JsonProcessingException jsonProcessingException) {
+            log.error("Json Processing error: {} ", jsonProcessingException.getLocalizedMessage(),
+                      jsonProcessingException);
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+        }
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        log.error("Malformed JSON or Unsupported Content: {}", e.getLocalizedMessage(), e);
         try {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(objectMapper.writeValueAsString(e.getLocalizedMessage()));

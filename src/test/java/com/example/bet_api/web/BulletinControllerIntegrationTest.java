@@ -51,6 +51,7 @@ class BulletinControllerIntegrationTest {
     }
 
 
+    // TODO: yigithanbalci 12.05.2025: add egdecase tests for input validation
     @Test
     void shouldCreateBulletinSuccessfully() {
         Instant time = ZonedDateTime.now().plusDays(1).toInstant();
@@ -89,7 +90,7 @@ class BulletinControllerIntegrationTest {
         WebClient client = WebClient.create("http://localhost:8080"); // adjust port if needed
 
         Flux<List> stream = client.get()
-                .uri("/api/bulletins/live")
+                .uri("/api/bulletins")
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
                 .bodyToFlux(List.class);
